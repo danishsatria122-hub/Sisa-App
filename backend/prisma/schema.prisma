@@ -1,0 +1,230 @@
+// SI:)SA - Bank Sampah Digital
+// Prisma schema — Tahap 1
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum Role {
+  ADMIN
+  NASABAH
+}
+
+enum MetodeSetoran {
+  ANTAR_SENDIRI
+  DIJEMPUT
+}
+
+// Sesuai FR-09: diajukan, diverifikasi, ditolak, selesai (wajib)
+// + status tambahan untuk flow pickup/QR (diterima, dibatalkan)
+enum StatusSetoran {
+  DIAJUKAN
+  DITERIMA
+  SUDAH_DISCAN
+  DIVERIFIKASI
+  DITOLAK
+  SELESAI
+  DIBATALKAN
+}
+
+enum StatusPenukaran {
+  DIPROSES
+  SELESAI
+  DITOLAK
+  DIBATALKAN
+}
+
+// ─────────────────────────────────────────────
+// USER / NASABAH & ADMIN (single table, dibedakan oleh role)
+// ─────────────────────────────────────────────
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  password     String
+  name         String
+  phone        String?
+  role         Role     @default(NASABAH)
+
+  // Saldo poin nasabah (BR-08: poin tidak expired, disimpan sebagai running balance)
+  pointBalance Int      @default(0)
+
+  addresses    Address[]
+  setoran      Setoran[]
+  penukaran    Penukaran[]
+
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// ADDRESS (profil nasabah, dipakai ulang untuk pickup)
+// ─────────────────────────────────────────────
+
+model Address {
+  id          String   @id @default(uuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  label       String?  // "Rumah", "Kos", dll
+  fullAddress String
+  isPrimary   Boolean  @default(false)
+
+  setoran     Setoran[] // pengajuan yang memakai address ini sebagai referensi (opsional)
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@map("addresses")
+}
+
+// ─────────────────────────────────────────────
+// KATEGORI SAMPAH
+// ─────────────────────────────────────────────
+
+model KategoriSampah {
+  id         String   @id @default(uuid())
+  nama       String
+  hargaPerKg Decimal  @db.Decimal(12, 2) // FR-08
+  poinPerKg  Decimal  @db.Decimal(12, 2) // FR-08
+  aktif      Boolean  @default(true)     // BR-13: nonaktif = tidak bisa dipakai transaksi baru
+  foto       String?
+
+  setoranItems SetoranItem[]
+
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@map("kategori_sampah")
+}
+
+// ─────────────────────────────────────────────
+// SETORAN (pengajuan)
+// ─────────────────────────────────────────────
+
+model Setoran {
+  id        String        @id @default(uuid())
+  kode      String        @unique // kode transaksi, mis. SISA-20260901-0001
+
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+
+  metode    MetodeSetoran
+  status    StatusSetoran @default(DIAJUKAN)
+
+  // Snapshot alamat pickup (FR-04: "Alamat yang tersimpan pada pengajuan menjadi snapshot transaksi")
+  addressId       String?
+  address         Address?  @relation(fields: [addressId], references: [id])
+  addressSnapshot String?   // teks alamat lengkap dibekukan saat pengajuan dibuat
+  tanggalPickup      DateTime?
+  waktuPickupMulai   String?
+  waktuPickupSelesai String?
+
+  // QR (FR-05, BR-16: QR mengidentifikasi transaksi, bukan akun permanen)
+  qrCode    String?   @unique
+  discanPada DateTime? @map("discan_pada")
+  discanOleh String?   @map("discan_oleh")
+
+  // Penolakan (FR-11, BR-07: wajib ada alasan)
+  alasanTolak String?
+
+  // Ringkasan hasil verifikasi (FR-06, FR-07)
+  totalBeratReal Decimal? @db.Decimal(12, 2)
+  totalPoin      Int?
+
+  items     SetoranItem[]
+
+  verifiedAt  DateTime?
+  completedAt DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("setoran")
+}
+
+// ─────────────────────────────────────────────
+// SETORAN ITEM
+// ─────────────────────────────────────────────
+
+model SetoranItem {
+  id         String   @id @default(uuid())
+
+  setoranId  String
+  setoran    Setoran  @relation(fields: [setoranId], references: [id], onDelete: Cascade)
+
+  kategoriSampahId String
+  kategoriSampah   KategoriSampah @relation(fields: [kategoriSampahId], references: [id])
+
+  // Snapshot harga & poin per kg SAAT transaksi (BR-15: nilai dipertahankan meski
+  // master data kategori berubah/dihapus di kemudian hari)
+  namaKategoriSnapshot String
+  hargaPerKgSnapshot   Decimal @db.Decimal(12, 2)
+  poinPerKgSnapshot    Decimal @db.Decimal(12, 2)
+
+  beratPerkiraan Decimal  @db.Decimal(12, 2) // input Nasabah (BR-02)
+  beratReal      Decimal? @db.Decimal(12, 2) // input Admin (BR-03)
+  poinDidapat    Int?                        // dihitung otomatis: beratReal * poinPerKgSnapshot (FR-07, BR-04)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("setoran_items")
+}
+
+// ─────────────────────────────────────────────
+// HADIAH
+// ─────────────────────────────────────────────
+
+model Hadiah {
+  id             String   @id @default(uuid())
+  nama           String
+  deskripsi      String?
+  poinDibutuhkan Int
+  stok           Int      @default(0) // BR-12: stok 0 -> tidak bisa ditukar (tetap tampil, status "Habis")
+  gambarUrl      String?
+
+  penukaran      Penukaran[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("hadiah")
+}
+
+// ─────────────────────────────────────────────
+// PENUKARAN
+// ─────────────────────────────────────────────
+
+model Penukaran {
+  id        String          @id @default(uuid())
+  kode      String          @unique // kode penukaran
+
+  userId    String
+  user      User            @relation(fields: [userId], references: [id])
+
+  hadiahId  String
+  hadiah    Hadiah          @relation(fields: [hadiahId], references: [id])
+
+  // Snapshot (BR-14/BR-15)
+  namaHadiahSnapshot String
+  poinTerpakai       Int
+
+  status    StatusPenukaran @default(DIPROSES) // BR-10/BR-11: poin dipotong saat dibuat, dikembalikan jika batal/tolak
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("penukaran")
+}

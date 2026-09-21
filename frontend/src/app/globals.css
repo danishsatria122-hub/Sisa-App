@@ -1,0 +1,288 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html {
+  scroll-behavior: smooth;
+}
+
+:root {
+  /* Brand Colors from PRD Section 13 */
+  --primary-green: #68E36D;
+  --functional-green: #4CAF50;
+  --soft-green: #AFD794;
+  --smile-yellow: #FAEF8A;
+  --digital-accent: #C7E6E9;
+  --bg-white: #FFFFFF;
+  --green-dark: #1E3A20;
+  --navy-dark: #0f172a;
+
+  /* Typography Families */
+  --font-display: 'Outfit', 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-body: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ── Unified Typography Scale ─────────────────────────────────────────────── */
+.t-display {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 5.6vw, 4.5rem);
+  font-weight: 700;
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.t-h2 {
+  font-family: var(--font-display);
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.t-h3 {
+  font-family: var(--font-display);
+  font-size: clamp(1.125rem, 1.6vw, 1.375rem);
+  font-weight: 600;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.t-lead {
+  font-family: var(--font-body);
+  font-size: clamp(1.125rem, 1.5vw, 1.3125rem);
+  font-weight: 400;
+  line-height: 1.5;
+  color: rgba(15, 23, 42, 0.85);
+}
+
+.t-body {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  font-weight: 300;
+  line-height: 1.7;
+  max-width: 36em;
+  color: #475569;
+  text-wrap: pretty;
+}
+
+.t-body--on-green,
+.t-body--on-dark {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.25vw, 1.125rem);
+  font-weight: 400;
+  line-height: 1.7;
+  max-width: 36em;
+  color: rgba(255, 255, 255, 0.95);
+  text-wrap: pretty;
+}
+
+.t-small {
+  font-family: var(--font-body);
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.55;
+}
+
+.t-label {
+  font-family: var(--font-body);
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0;
+}
+
+.t-eyebrow {
+  font-family: var(--font-body);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  line-height: 1;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-weight: 400;
+  background-color: var(--bg-white);
+  color: #1F2937;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ── Kenali SI:)SA — Step text ────────────────────────────────────────────── */
+/* --story-weight is 400 (not 300) because white-on-#4CAF50 at weight 300     */
+/* is ~2.82:1 and does NOT meet WCAG large-text threshold (3:1) at 1.3rem.   */
+/* Change this single variable if the background darkens enough to allow 300. */
+:root {
+  --story-weight: 400;
+}
+
+.story-text {
+  font-family: var(--font-body);
+  font-size: clamp(1rem, 1.4vw, 1.1875rem);
+  font-weight: var(--story-weight);
+  line-height: 1.55;
+  letter-spacing: -0.005em;
+  color: rgba(255, 255, 255, 0.96);
+  max-width: 30em;
+  text-wrap: pretty;
+}
+
+.story-text-emph {
+  font-weight: 500;
+  color: #ffffff;
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: #FFFFFF;
+  }
+}
+
+/* Hero Typography Reveal Animations */
+@keyframes heroFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes heroDrawUnderline {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.hero-anim-eyebrow {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 0ms forwards;
+}
+
+.hero-anim-lead {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 120ms forwards;
+}
+
+.hero-anim-emph {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 240ms forwards;
+}
+
+.hero-anim-copy {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 360ms forwards;
+}
+
+.hero-anim-btn {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 480ms forwards;
+}
+
+@keyframes ctaFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cta-anim-eyebrow {
+  opacity: 0;
+  animation: ctaFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 0ms forwards;
+}
+
+.cta-anim-headline {
+  opacity: 0;
+  animation: ctaFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 100ms forwards;
+}
+
+.cta-anim-paragraph {
+  opacity: 0;
+  animation: ctaFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 200ms forwards;
+}
+
+.cta-anim-buttons {
+  opacity: 0;
+  animation: ctaFadeUp 500ms cubic-bezier(0.16, 1, 0.3, 1) 300ms forwards;
+}
+
+@keyframes aboutHeroSettle {
+  from {
+    transform: scale(1.05);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.about-photo-settle {
+  animation: aboutHeroSettle 1600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  will-change: transform;
+}
+
+.about-anim-eyebrow {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 0ms forwards;
+}
+
+.about-anim-line1 {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 110ms forwards;
+}
+
+.about-anim-line2 {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 220ms forwards;
+}
+
+.about-anim-copy {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 330ms forwards;
+}
+
+.about-anim-btn {
+  opacity: 0;
+  animation: heroFadeUp 600ms cubic-bezier(0.16, 1, 0.3, 1) 440ms forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-anim-eyebrow,
+  .hero-anim-lead,
+  .hero-anim-emph,
+  .hero-anim-copy,
+  .hero-anim-btn,
+  .cta-anim-eyebrow,
+  .cta-anim-headline,
+  .cta-anim-paragraph,
+  .cta-anim-buttons,
+  .about-anim-eyebrow,
+  .about-anim-line1,
+  .about-anim-line2,
+  .about-anim-copy,
+  .about-anim-btn {
+    opacity: 1 !important;
+    transform: none !important;
+    animation: none !important;
+  }
+  .about-photo-settle {
+    transform: none !important;
+    animation: none !important;
+  }
+}
+
