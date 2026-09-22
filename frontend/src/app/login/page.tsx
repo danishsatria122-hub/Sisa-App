@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import { useToast } from '@/lib/toast-context';
 import { getErrorMessage } from '@/lib/api';
-import { SisaLogo } from '@/components/sisa-logo';
+import { SisaLogo, SisaSmileIcon } from '@/components/sisa-logo';
 import { SisaSmilePatternGrid } from '@/components/sisa-smile-watermark';
 
 const schema = z.object({
@@ -24,6 +24,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [submitting, setSubmitting] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
+  const [loginError, setLoginError] = useState<string | null>(null);
 
   const {
     register,
@@ -31,14 +32,28 @@ export default function LoginPage() {
     formState: { errors },
   } = useForm<FormData>({ resolver: zodResolver(schema) });
 
+  const getFriendlyLoginError = (err: unknown) => {
+    const message = getErrorMessage(err).toLowerCase();
+
+    if (message.includes('terdaftar') || message.includes('not found') || message.includes('user tidak ditemukan')) {
+      return 'Akunmu belum terdaftar di SI:)SA, atau emailnya mungkin typo. Coba cek lagi ya :)';
+    }
+
+    return 'Waduh, kombinasi email dan password belum cocok. Cek lagi, ya — SI:)SA nggak mau bikin kamu pusing.';
+  };
+
   const onSubmit = async (values: FormData) => {
     setSubmitting(true);
+    setLoginError(null);
+
     try {
       const user = await login(values.email, values.password);
       showToast(`Selamat datang, ${user.name}!`, 'success');
       router.push(user.role === 'ADMIN' ? '/admin/dashboard' : '/dashboard');
     } catch (err) {
-      showToast(getErrorMessage(err), 'error');
+      const friendlyMessage = getFriendlyLoginError(err);
+      setLoginError(friendlyMessage);
+      showToast(friendlyMessage, 'error');
     } finally {
       setSubmitting(false);
     }
@@ -188,6 +203,23 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-5">
+            {loginError && (
+              <div
+                role="alert"
+                aria-live="polite"
+                className="rounded-2xl border border-amber-200 bg-gradient-to-r from-yellow-50 via-amber-50 to-emerald-50 p-3.5 shadow-sm shadow-amber-200/40"
+              >
+                <div className="flex items-start gap-3">
+                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-lg shadow-sm ring-2 ring-amber-200/70">
+                    <SisaSmileIcon size={22} color="#F59E0B" />
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-gray-800">Ups, login belum cocok :(</p>
+                    <p className="mt-1 text-xs leading-relaxed text-gray-600">{loginError}</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Email */}
             <div>
