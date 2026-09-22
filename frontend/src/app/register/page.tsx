@@ -172,10 +172,10 @@ export default function RegisterPage() {
       <div className="relative z-10 w-full max-w-[440px]">
 
         {/* Card */}
-        <div className="rounded-3xl bg-white px-8 py-10 shadow-2xl shadow-black/20 sm:px-10">
+        <div className="auth-panel-entry rounded-3xl bg-white px-8 py-10 shadow-2xl shadow-black/20 sm:px-10">
 
           {/* Card Header */}
-          <div className="mb-7">
+          <div className="auth-form-item mb-7" style={{ animationDelay: '140ms' }}>
             <span className="inline-flex items-center gap-1.5 rounded-full border border-functional-green/20 bg-functional-green/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.13em] text-functional-green">
               <span className="h-1.5 w-1.5 rounded-full bg-functional-green" />
               Daftar Akun
@@ -189,7 +189,7 @@ export default function RegisterPage() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit(onSubmit)} noValidate className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} noValidate className="auth-form-item space-y-4" style={{ animationDelay: '220ms' }}>
 
             {/* Nama Lengkap */}
             <div>
@@ -363,7 +363,7 @@ export default function RegisterPage() {
           </form>
 
           {/* Switch to Login */}
-          <div className="mt-6 pt-5 border-t border-gray-100 text-center text-sm text-gray-400">
+          <div className="auth-form-item mt-6 pt-5 border-t border-gray-100 text-center text-sm text-gray-400" style={{ animationDelay: '260ms' }}>
             Sudah punya akun?{' '}
             <Link
               href="/login"
