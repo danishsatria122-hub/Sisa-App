@@ -79,9 +79,14 @@ export function QrScanner({
       processingRef.current = false;
       void stopScanner();
       if (scannerRef.current) {
-        scannerRef.current
-          .clear()
-          .catch(() => {});
+        try {
+          const clearResult = scannerRef.current.clear();
+          if (clearResult && typeof clearResult.catch === 'function') {
+            clearResult.catch(() => {});
+          }
+        } catch {
+          // ignore cleanup failures during unmount
+        }
       }
       scannerRef.current = null;
     };
