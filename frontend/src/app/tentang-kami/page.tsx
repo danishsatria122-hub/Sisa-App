@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { LandingNav } from '@/components/landing-nav';
 import { LandingFooter } from '@/components/landing-footer';
+import { PublicSmoothScroll } from '@/components/public-smooth-scroll';
 import { AboutOpening } from '@/components/about/about-opening';
 import { AboutMissionData } from '@/components/about/about-mission-data';
 import { AboutToday } from '@/components/about/about-today';
@@ -17,6 +18,7 @@ export const metadata: Metadata = {
 export default function TentangKamiPage() {
   return (
     <div className="min-h-screen bg-[#FAFBF9] text-gray-900 selection:bg-primary-green selection:text-gray-900 flex flex-col">
+      <PublicSmoothScroll />
       <LandingNav />
       <main className="flex-1">
         {/* 01 — OPENING (No photo, no CTA) */}

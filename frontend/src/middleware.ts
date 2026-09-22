@@ -19,7 +19,6 @@ export function middleware(request: NextRequest) {
   const isAuthPage = AUTH_PAGES.some((p) => pathname.startsWith(p));
   const isPublicPage = PUBLIC_PAGES.some((p) => pathname === p || pathname.startsWith(p + '/'));
 
-  // Jika belum login dan bukan halaman publik atau halaman auth -> arahkan ke /login
   if (!token && !isAuthPage && !isPublicPage) {
     return NextResponse.redirect(new URL('/login', request.url));
   }
@@ -27,19 +26,22 @@ export function middleware(request: NextRequest) {
   if (token) {
     const role = decodeRole(token);
 
-    // Sudah login tapi buka /login atau /register -> lempar ke dashboard sesuai role
+    if (!role) {
+      const response = NextResponse.redirect(new URL('/login', request.url));
+      response.cookies.delete('sisa_token');
+      return response;
+    }
+
     if (isAuthPage) {
       return NextResponse.redirect(
         new URL(role === 'ADMIN' ? '/admin/dashboard' : '/dashboard', request.url),
       );
     }
 
-    // Nasabah akses admin -> lempar ke dashboard
     if (pathname.startsWith('/admin') && role !== 'ADMIN') {
       return NextResponse.redirect(new URL('/dashboard', request.url));
     }
 
-    // Admin tidak perlu akses halaman Nasabah (kecuali halaman publik seperti '/' dan '/tentang-kami')
     if (!pathname.startsWith('/admin') && role === 'ADMIN' && !isPublicPage) {
       return NextResponse.redirect(new URL('/admin/dashboard', request.url));
     }

@@ -1,33 +1,12 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { CaraKerjaSection } from './cara-kerja-section';
 import { KenaliSisaSection } from './kenali-sisa-section';
 import { SisaSmileWatermark } from './sisa-smile-watermark';
+import { PublicReveal } from './public-reveal';
 
 export function LandingFeatures() {
-  const [ctaInView, setCtaInView] = useState(false);
-  const ctaRef = useRef<HTMLDivElement | null>(null);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setCtaInView(true);
-          observer.disconnect();
-        }
-      },
-      { threshold: 0.15 }
-    );
-
-    if (ctaRef.current) {
-      observer.observe(ctaRef.current);
-    }
-
-    return () => observer.disconnect();
-  }, []);
-
   const categories = [
     {
       title: 'Plastik PET & HDPE',
@@ -107,8 +86,8 @@ export function LandingFeatures() {
           paddingBottom: 'clamp(48px, 7vh, 80px)',
         }}
       >
-        <div
-          ref={ctaRef}
+        <PublicReveal
+          as="div"
           className="relative rounded-3xl bg-functional-green text-white overflow-hidden"
           style={{
             padding: 'clamp(32px, 5vw, 64px)',
@@ -127,17 +106,11 @@ export function LandingFeatures() {
           />
           
           <div className="relative z-10 max-w-2xl">
-            <span
-              className={`inline-block t-eyebrow text-smile-yellow ${
-                ctaInView ? 'cta-anim-eyebrow' : 'opacity-0 motion-reduce:opacity-100'
-              }`}
-            >
+            <span className="inline-block t-eyebrow text-smile-yellow">
               Mulai Langkah Kecilmu
             </span>
             <h2
-              className={`mt-2 font-display text-white ${
-                ctaInView ? 'cta-anim-headline' : 'opacity-0 motion-reduce:opacity-100'
-              }`}
+              className="mt-2 font-display text-white"
               style={{
                 fontSize: 'clamp(2rem, 4vw, 3rem)',
                 fontWeight: 700,
@@ -149,10 +122,7 @@ export function LandingFeatures() {
             >
               Siap membuat bumi dan dompetmu tersenyum? :)
             </h2>
-            <p
-              className={`text-white/95 ${
-                ctaInView ? 'cta-anim-paragraph' : 'opacity-0 motion-reduce:opacity-100'
-              }`}
+            <p className="text-white/95"
               style={{
                 fontFamily: 'var(--font-body)',
                 fontSize: 'clamp(1rem, 1.3vw, 1.125rem)',
@@ -164,11 +134,7 @@ export function LandingFeatures() {
             >
               Bergabung bersama ribuan nasabah muda SI:)SA lainnya. Mulai setor sampah daur ulang pertamamu hari ini!
             </p>
-            <div
-              className={`mt-8 flex flex-col min-[480px]:flex-row min-[480px]:items-center gap-3 ${
-                ctaInView ? 'cta-anim-buttons' : 'opacity-0 motion-reduce:opacity-100'
-              }`}
-            >
+            <div className="mt-8 flex flex-col min-[480px]:flex-row min-[480px]:items-center gap-3">
               <Link
                 href="/register"
                 className="inline-flex h-[52px] w-full min-[480px]:w-auto items-center justify-center rounded-full bg-white px-7 font-sans text-base font-semibold text-functional-green transition-all duration-200 [transition-timing-function:cubic-bezier(.2,.8,.2,1)] hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-4px_rgba(30,58,32,0.25)] active:translate-y-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-white focus-visible:outline-offset-[3px] motion-reduce:transform-none motion-reduce:transition-colors shrink-0 select-none"
@@ -183,7 +149,7 @@ export function LandingFeatures() {
               </Link>
             </div>
           </div>
-        </div>
+        </PublicReveal>
       </section>
     </div>
   );
