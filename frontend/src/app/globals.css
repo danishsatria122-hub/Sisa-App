@@ -6,21 +6,12 @@ html {
   scroll-behavior: auto;
 }
 
-html.lenis,
-html.lenis body {
-  height: auto;
+html.public-scroll-smooth {
+  scroll-behavior: smooth;
 }
 
-.lenis-smooth {
-  scroll-behavior: auto;
-}
-
-.lenis-stopped {
-  overflow: hidden;
-}
-
-[data-lenis-prevent] {
-  overscroll-behavior: contain;
+body {
+  overflow-x: hidden;
 }
 
 [data-reveal] {
