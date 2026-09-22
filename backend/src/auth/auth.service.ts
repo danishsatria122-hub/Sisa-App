@@ -5,6 +5,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { RegisterDto } from './dto/register.dto';
 import { LoginDto } from './dto/login.dto';
 import { Role } from '@prisma/client';
+import { buildPhotoUrl } from '../common/utils/file-upload.util';
 
 @Injectable()
 export class AuthService {
@@ -30,7 +31,14 @@ export class AuthService {
       },
     });
 
-    return this.buildAuthResponse(user.id, user.email, user.role, user.name, user.pointBalance);
+    return this.buildAuthResponse(
+      user.id,
+      user.email,
+      user.role,
+      user.name,
+      user.pointBalance,
+      user.foto,
+    );
   }
 
   async login(dto: LoginDto) {
@@ -44,7 +52,14 @@ export class AuthService {
       throw new UnauthorizedException('Email atau password salah');
     }
 
-    return this.buildAuthResponse(user.id, user.email, user.role, user.name, user.pointBalance);
+    return this.buildAuthResponse(
+      user.id,
+      user.email,
+      user.role,
+      user.name,
+      user.pointBalance,
+      user.foto,
+    );
   }
 
   async me(userId: string) {
@@ -56,20 +71,40 @@ export class AuthService {
         name: true,
         phone: true,
         role: true,
+        foto: true,
         pointBalance: true,
         createdAt: true,
       },
     });
     if (!user) throw new UnauthorizedException('User tidak ditemukan');
-    return user;
+    return {
+      ...user,
+      foto: user.foto ?? null,
+      foto_url: buildPhotoUrl(user.foto),
+    };
   }
 
-  private buildAuthResponse(userId: string, email: string, role: Role, name: string, pointBalance = 0) {
+  private buildAuthResponse(
+    userId: string,
+    email: string,
+    role: Role,
+    name: string,
+    pointBalance = 0,
+    foto: string | null = null,
+  ) {
     const payload = { sub: userId, email, role };
     const accessToken = this.jwt.sign(payload);
     return {
       accessToken,
-      user: { id: userId, email, name, role, pointBalance },
+      user: {
+        id: userId,
+        email,
+        name,
+        role,
+        pointBalance,
+        foto: foto ?? null,
+        foto_url: buildPhotoUrl(foto),
+      },
     };
   }
 }

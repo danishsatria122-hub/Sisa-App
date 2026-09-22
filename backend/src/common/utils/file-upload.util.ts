@@ -59,14 +59,19 @@ export function getUploadRootDir(): string {
   return path.resolve(process.cwd(), 'uploads');
 }
 
-export function getKategoriUploadDir(): string {
+export function getUploadDir(subdir = 'kategori-sampah'): string {
   const envUploadDir = process.env.UPLOAD_DIR;
   if (envUploadDir) {
-    return path.isAbsolute(envUploadDir)
+    const resolvedRoot = path.isAbsolute(envUploadDir)
       ? envUploadDir
       : path.resolve(process.cwd(), envUploadDir);
+    return path.resolve(resolvedRoot, subdir);
   }
-  return path.resolve(process.cwd(), 'uploads', 'kategori-sampah');
+  return path.resolve(process.cwd(), 'uploads', subdir);
+}
+
+export function getKategoriUploadDir(): string {
+  return getUploadDir('kategori-sampah');
 }
 
 /**
@@ -76,13 +81,14 @@ export function getKategoriUploadDir(): string {
 export async function saveUploadedFile(
   buffer: Buffer,
   ext: string,
+  subdir = 'kategori-sampah',
 ): Promise<{ relativePath: string; fullPath: string }> {
-  const targetDir = getKategoriUploadDir();
+  const targetDir = getUploadDir(subdir);
   await fs.promises.mkdir(targetDir, { recursive: true });
 
   const randomFilename = `${uuidv4()}${ext}`;
   const fullPath = path.join(targetDir, randomFilename);
-  const relativePath = `kategori-sampah/${randomFilename}`;
+  const relativePath = `${subdir}/${randomFilename}`;
 
   await fs.promises.writeFile(fullPath, buffer);
   return { relativePath, fullPath };

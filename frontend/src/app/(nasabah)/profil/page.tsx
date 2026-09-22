@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { api, getErrorMessage } from '@/lib/api';
 import { Address } from '@/lib/types';
@@ -22,6 +22,9 @@ export default function ProfilPage() {
   const [isPrimary, setIsPrimary] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Address | null>(null);
+  const [uploadingPhoto, setUploadingPhoto] = useState(false);
+  const [photoPreview, setPhotoPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const load = () => {
     setLoading(true);
@@ -89,6 +92,58 @@ export default function ProfilPage() {
 
   const userInitial = user?.name ? user.name.trim().charAt(0).toUpperCase() : 'N';
 
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      showToast('Format foto harus JPG, PNG, atau WebP', 'error');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    if (file.size > 1 * 1024 * 1024) {
+      showToast('Ukuran foto terlalu besar. Maksimal 1 MB', 'error');
+      if (fileInputRef.current) fileInputRef.current.value = '';
+      return;
+    }
+
+    const objectUrl = URL.createObjectURL(file);
+    setPhotoPreview(objectUrl);
+    void uploadProfilePhoto(file);
+  };
+
+  const uploadProfilePhoto = async (file: File) => {
+    setUploadingPhoto(true);
+    try {
+      const formData = new FormData();
+      formData.append('foto', file);
+      await api.patch('/profil/foto', formData);
+      showToast('Foto profil berhasil diperbarui', 'success');
+      await refreshUser();
+    } catch (err) {
+      showToast(getErrorMessage(err), 'error');
+    } finally {
+      if (photoPreview) {
+        URL.revokeObjectURL(photoPreview);
+      }
+      setPhotoPreview(null);
+      setUploadingPhoto(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
+
+  const removeProfilePhoto = async () => {
+    try {
+      await api.delete('/profil/foto');
+      showToast('Foto profil berhasil dihapus', 'success');
+      await refreshUser();
+    } catch (err) {
+      showToast(getErrorMessage(err), 'error');
+    }
+  };
+
   return (
     <div className="mx-auto max-w-2xl space-y-7 sm:space-y-8">
       {/* ── 1. Page Header ── */}
@@ -114,8 +169,31 @@ export default function ProfilPage() {
 
         {/* Identity Row */}
         <div className="relative z-10 flex items-center gap-4">
-          <div className="flex h-14 w-14 min-w-[56px] min-h-[56px] shrink-0 items-center justify-center rounded-2xl bg-functional-green/10 text-functional-green font-bold text-xl border border-functional-green/20 shadow-xs">
-            {userInitial}
+          <div className="relative flex h-14 w-14 min-w-[56px] min-h-[56px] shrink-0 items-center justify-center overflow-hidden rounded-2xl border border-functional-green/20 bg-functional-green/10 text-xl font-bold text-functional-green shadow-xs">
+            {user?.foto_url ? (
+              <img
+                src={user.foto_url}
+                alt={user.name}
+                className="h-full w-full object-cover"
+              />
+            ) : (
+              userInitial
+            )}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              className="hidden"
+              onChange={handlePhotoChange}
+            />
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full border border-white bg-functional-green text-[10px] font-bold text-white shadow-sm"
+              title="Ubah foto profil"
+            >
+              +
+            </button>
           </div>
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
@@ -130,6 +208,25 @@ export default function ProfilPage() {
             <p className="mt-0.5 text-xs text-gray-400">
               Akun personal nasabah bank sampah
             </p>
+          </div>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingPhoto}
+              className="rounded-lg border border-functional-green/30 bg-functional-green/5 px-3 py-1.5 text-[11px] font-semibold text-functional-green disabled:opacity-60"
+            >
+              {uploadingPhoto ? 'Menyimpan...' : 'Ubah foto'}
+            </button>
+            {user?.foto_url && (
+              <button
+                type="button"
+                onClick={removeProfilePhoto}
+                className="rounded-lg border border-red-200 bg-red-50 px-3 py-1.5 text-[11px] font-semibold text-red-500"
+              >
+                Hapus
+              </button>
+            )}
           </div>
         </div>
 

@@ -1,5 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsInt, IsNotEmpty, IsOptional, IsString, Min } from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsInt, IsNotEmpty, IsNumber, IsOptional, IsString, Min } from 'class-validator';
 
 export class CreateHadiahDto {
   @ApiProperty({ example: 'Tumbler SI:)SA' })
@@ -13,12 +14,14 @@ export class CreateHadiahDto {
   deskripsi?: string;
 
   @ApiProperty({ example: 500 })
-  @IsInt()
+  @Type(() => Number)
+  @IsNumber()
   @Min(1)
   poinDibutuhkan: number;
 
   @ApiProperty({ example: 10 })
-  @IsInt()
+  @Type(() => Number)
+  @IsNumber()
   @Min(0)
   stok: number;
 
@@ -26,6 +29,10 @@ export class CreateHadiahDto {
   @IsOptional()
   @IsString()
   gambarUrl?: string;
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @IsOptional()
+  foto?: any;
 }
 
 export class UpdateHadiahDto {
@@ -41,13 +48,15 @@ export class UpdateHadiahDto {
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsInt()
+  @Type(() => Number)
+  @IsNumber()
   @Min(1)
   poinDibutuhkan?: number;
 
   @ApiProperty({ required: false })
   @IsOptional()
-  @IsInt()
+  @Type(() => Number)
+  @IsNumber()
   @Min(0)
   stok?: number;
 
@@ -55,4 +64,8 @@ export class UpdateHadiahDto {
   @IsOptional()
   @IsString()
   gambarUrl?: string;
+
+  @ApiProperty({ type: 'string', format: 'binary', required: false })
+  @IsOptional()
+  foto?: any;
 }

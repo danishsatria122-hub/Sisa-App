@@ -9,6 +9,7 @@ import { HadiahModule } from './hadiah/hadiah.module';
 import { PenukaranModule } from './penukaran/penukaran.module';
 import { LaporanModule } from './laporan/laporan.module';
 import { AddressModule } from './address/address.module';
+import { ProfileModule } from './profile/profile.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { AddressModule } from './address/address.module';
     PenukaranModule,
     LaporanModule,
     AddressModule,
+    ProfileModule,
   ],
   controllers: [],
   providers: [],

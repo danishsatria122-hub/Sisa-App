@@ -53,9 +53,18 @@ export function Navbar() {
 
         {/* Desktop: user name + logout */}
         <div className="hidden items-center gap-3 md:flex">
-          <span className="text-xs text-gray-400">
-            {user?.name?.split(' ')[0] ?? 'Nasabah'}
-          </span>
+          <div className="flex items-center gap-2 rounded-full border border-gray-200 bg-gray-50 px-2 py-1">
+            <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white text-[10px] font-bold text-functional-green">
+              {user?.foto_url ? (
+                <img src={user.foto_url} alt={user.name} className="h-full w-full object-cover" />
+              ) : (
+                (user?.name?.split(' ')[0]?.[0] ?? 'N').toUpperCase()
+              )}
+            </div>
+            <span className="text-xs text-gray-400">
+              {user?.name?.split(' ')[0] ?? 'Nasabah'}
+            </span>
+          </div>
           <button
             onClick={logout}
             className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 transition hover:border-gray-300 hover:bg-gray-50 hover:text-gray-700"
@@ -106,7 +115,16 @@ export function Navbar() {
             ))}
           </div>
           <div className="mt-3 flex items-center justify-between border-t border-gray-100 pt-3">
-            <span className="text-xs text-gray-400">{user?.name?.split(' ')[0]}</span>
+            <div className="flex items-center gap-2">
+              <div className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border border-gray-200 bg-white text-[10px] font-bold text-functional-green">
+                {user?.foto_url ? (
+                  <img src={user.foto_url} alt={user.name} className="h-full w-full object-cover" />
+                ) : (
+                  (user?.name?.split(' ')[0]?.[0] ?? 'N').toUpperCase()
+                )}
+              </div>
+              <span className="text-xs text-gray-400">{user?.name?.split(' ')[0]}</span>
+            </div>
             <button
               onClick={logout}
               className="rounded-lg border border-gray-200 px-3 py-1.5 text-xs font-medium text-gray-500 hover:bg-gray-50"

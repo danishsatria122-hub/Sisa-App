@@ -54,6 +54,7 @@ model User {
   name         String
   phone        String?
   role         Role     @default(NASABAH)
+  foto         String?
 
   // Saldo poin nasabah (BR-08: poin tidak expired, disimpan sebagai running balance)
   pointBalance Int      @default(0)
@@ -193,6 +194,7 @@ model Hadiah {
   deskripsi      String?
   poinDibutuhkan Int
   stok           Int      @default(0) // BR-12: stok 0 -> tidak bisa ditukar (tetap tampil, status "Habis")
+  foto           String?
   gambarUrl      String?
 
   penukaran      Penukaran[]

@@ -92,19 +92,32 @@ export function Modal({
   title,
   onClose,
   children,
+  contentClassName = '',
+  headerClassName = '',
+  closeButtonClassName = '',
 }: {
   open: boolean;
   title: string;
   onClose: () => void;
   children: ReactNode;
+  contentClassName?: string;
+  headerClassName?: string;
+  closeButtonClassName?: string;
 }) {
   if (!open) return null;
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl">
-        <div className="mb-4 flex items-center justify-between">
+      <div
+        className={`max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-xl bg-white p-6 shadow-xl ${contentClassName}`}
+      >
+        <div className={`mb-4 flex items-center justify-between gap-3 ${headerClassName}`}>
           <h3 className="text-lg font-semibold text-gray-800">{title}</h3>
-          <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+          <button
+            type="button"
+            onClick={onClose}
+            aria-label="Tutup modal"
+            className={`flex h-9 w-9 items-center justify-center rounded-lg border border-gray-200 bg-white text-base text-gray-400 transition hover:bg-gray-100 hover:text-gray-600 focus:outline-none focus:ring-2 focus:ring-functional-green/20 ${closeButtonClassName}`}
+          >
             ✕
           </button>
         </div>

@@ -10,6 +10,7 @@ const SAFE_SELECT = {
   name: true,
   phone: true,
   role: true,
+  foto: true,
   pointBalance: true,
   createdAt: true,
   updatedAt: true,

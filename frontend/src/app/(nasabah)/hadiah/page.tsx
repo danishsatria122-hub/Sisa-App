@@ -76,8 +76,16 @@ export default function KatalogHadiahPage() {
                 data-testid="hadiah-card"
                 className="flex flex-col rounded-xl border border-gray-100 bg-white p-4 shadow-sm"
               >
-                <div className="mb-3 flex h-24 items-center justify-center rounded-lg bg-digital-accent/40 text-4xl">
-                  🎁
+                <div className="mb-3 flex h-24 items-center justify-center overflow-hidden rounded-lg bg-digital-accent/40">
+                  {h.foto_url ? (
+                    <img
+                      src={h.foto_url}
+                      alt={h.nama}
+                      className="h-full w-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-4xl">🎁</span>
+                  )}
                 </div>
                 <p className="font-semibold text-gray-800">{h.nama}</p>
                 {h.deskripsi && (

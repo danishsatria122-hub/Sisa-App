@@ -31,6 +31,11 @@ export default function AdminKelolaPengajuanPage() {
   const [rejectTarget, setRejectTarget] = useState<Setoran | null>(null);
   const [alasanTolak, setAlasanTolak] = useState('');
   const [scanOpen, setScanOpen] = useState(false);
+  const [scanState, setScanState] = useState<'idle' | 'success' | 'error'>('idle');
+  const [scanResult, setScanResult] = useState<Setoran | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
+  const [scanAttempt, setScanAttempt] = useState(0);
+  const [scanLocked, setScanLocked] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
 
   const { showToast } = useToast();
@@ -92,15 +97,40 @@ export default function AdminKelolaPengajuanPage() {
     }
   };
 
+  const resetScanModal = () => {
+    setScanState('idle');
+    setScanResult(null);
+    setScanError(null);
+    setScanLocked(false);
+  };
+
+  const openScanModal = () => {
+    resetScanModal();
+    setScanOpen(true);
+    setScanAttempt((value) => value + 1);
+  };
+
+  const closeScanModal = () => {
+    setScanOpen(false);
+    resetScanModal();
+    setScanAttempt((value) => value + 1);
+  };
+
   const handleScanResult = async (code: string) => {
+    if (scanLocked) return;
+    setScanLocked(true);
+
     try {
       const { data } = await api.post<Setoran>(`/admin/setoran/scan/${encodeURIComponent(code)}`);
-      setScanOpen(false);
-      showToast(`QR transaksi ${data.kode} berhasil discan`, 'success');
+      setScanState('success');
+      setScanResult(data);
+      setScanError(null);
       load();
-      router.push(`/admin/setoran/${data.id}/verifikasi`);
     } catch (err) {
-      showToast(getErrorMessage(err), 'error');
+      setScanState('error');
+      setScanResult(null);
+      setScanError('Transaksi dengan kode QR ini tidak ditemukan.');
+      setScanLocked(true);
     }
   };
 
@@ -109,7 +139,7 @@ export default function AdminKelolaPengajuanPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold text-gray-800">Kelola Pengajuan</h1>
         <button
-          onClick={() => setScanOpen(true)}
+          onClick={openScanModal}
           className="rounded-lg bg-functional-green px-4 py-2 text-sm font-semibold text-white hover:bg-green-700"
         >
           📷 Scan QR
@@ -325,8 +355,88 @@ export default function AdminKelolaPengajuanPage() {
       </Modal>
 
       {/* Modal Scan QR */}
-      <Modal open={scanOpen} title="Scan QR Setoran" onClose={() => setScanOpen(false)}>
-        <QrScanner onResult={handleScanResult} />
+      <Modal
+        open={scanOpen}
+        title="Scan QR Setoran"
+        onClose={closeScanModal}
+        contentClassName="max-w-md p-4 sm:p-5"
+        headerClassName="mb-3 border-b border-gray-100 pb-3"
+        closeButtonClassName="h-8 w-8"
+      >
+        {scanState === 'idle' ? (
+          <QrScanner key={scanAttempt} onResult={handleScanResult} disabled={scanLocked} />
+        ) : scanState === 'success' && scanResult ? (
+          <div className="space-y-4 sm:space-y-5">
+            <div className="rounded-2xl border border-green-200 bg-green-50 p-4 text-center sm:p-5">
+              <div className="mx-auto mb-3 flex h-14 w-14 items-center justify-center rounded-full bg-green-100 text-2xl font-semibold text-green-700">
+                ✓
+              </div>
+              <h4 className="text-lg font-semibold text-gray-900">Berhasil</h4>
+              <p className="mt-1 text-sm text-gray-600">
+                QR setoran sudah dipindai dan status transaksi berhasil diperbarui.
+              </p>
+            </div>
+
+            <div className="space-y-2 rounded-xl border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 sm:p-4">
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-gray-500">Kode</span>
+                <span className="font-semibold text-gray-800">{scanResult.kode}</span>
+              </div>
+              <div className="flex items-center justify-between gap-4">
+                <span className="text-gray-500">Nasabah</span>
+                <span className="font-medium text-gray-800">{scanResult.user?.name ?? '-'}</span>
+              </div>
+              {scanResult.metode && (
+                <div className="flex items-center justify-between gap-4">
+                  <span className="text-gray-500">Metode</span>
+                  <span className="font-medium text-gray-800">
+                    {scanResult.metode === 'ANTAR_SENDIRI' ? 'Antar Sendiri' : 'Dijemput'}
+                  </span>
+                </div>
+              )}
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={closeScanModal}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+              >
+                Tutup
+              </button>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 sm:space-y-5">
+            <div className="rounded-2xl border border-red-200 bg-red-50 px-4 py-4 text-left sm:px-5">
+              <p className="text-base font-semibold text-red-700">QR tidak valid</p>
+              <p className="mt-2 text-sm text-red-600">{scanError}</p>
+            </div>
+
+            <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+              <button
+                type="button"
+                onClick={closeScanModal}
+                className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 sm:w-auto"
+              >
+                Tutup
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setScanState('idle');
+                  setScanError(null);
+                  setScanResult(null);
+                  setScanLocked(false);
+                  setScanAttempt((value) => value + 1);
+                }}
+                className="w-full rounded-lg bg-functional-green px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-green-700 sm:w-auto"
+              >
+                Coba Lagi
+              </button>
+            </div>
+          </div>
+        )}
       </Modal>
     </div>
   );

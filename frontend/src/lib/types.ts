@@ -18,6 +18,8 @@ export interface User {
   name: string;
   phone?: string | null;
   role: Role;
+  foto?: string | null;
+  foto_url?: string | null;
   pointBalance?: number;
   createdAt?: string;
 }
@@ -80,6 +82,8 @@ export interface Hadiah {
   deskripsi?: string | null;
   poinDibutuhkan: number;
   stok: number;
+  foto?: string | null;
+  foto_url?: string | null;
   gambarUrl?: string | null;
   statusStok?: 'TERSEDIA' | 'HABIS';
 }
