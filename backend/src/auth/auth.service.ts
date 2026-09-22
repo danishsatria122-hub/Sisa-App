@@ -62,7 +62,7 @@ export class AuthService {
     );
   }
 
-  async me(userId: string) {
+  async me(userId: string, baseUrl?: string) {
     const user = await this.prisma.user.findUnique({
       where: { id: userId },
       select: {
@@ -80,7 +80,7 @@ export class AuthService {
     return {
       ...user,
       foto: user.foto ?? null,
-      foto_url: buildPhotoUrl(user.foto),
+      foto_url: buildPhotoUrl(user.foto, baseUrl),
     };
   }
 

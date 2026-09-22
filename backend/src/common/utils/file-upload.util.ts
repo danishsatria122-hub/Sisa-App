@@ -62,10 +62,13 @@ export function getUploadRootDir(): string {
 export function getUploadDir(subdir = 'kategori-sampah'): string {
   const envUploadDir = process.env.UPLOAD_DIR;
   if (envUploadDir) {
-    const resolvedRoot = path.isAbsolute(envUploadDir)
+    const configuredDir = path.isAbsolute(envUploadDir)
       ? envUploadDir
       : path.resolve(process.cwd(), envUploadDir);
-    return path.resolve(resolvedRoot, subdir);
+    const uploadRoot = path.basename(configuredDir) === 'uploads'
+      ? configuredDir
+      : path.dirname(configuredDir);
+    return path.resolve(uploadRoot, subdir);
   }
   return path.resolve(process.cwd(), 'uploads', subdir);
 }

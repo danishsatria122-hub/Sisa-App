@@ -24,8 +24,8 @@ export class ProfileController {
 
   @Get()
   @ApiOperation({ summary: 'Ambil profil user yang login' })
-  getProfile(@CurrentUser() user: JwtUserPayload) {
-    return this.service.getProfile(user.userId);
+  getProfile(@CurrentUser() user: JwtUserPayload, @Req() req: any) {
+    return this.service.getProfile(user.userId, this.getBaseUrl(req));
   }
 
   @Patch()
