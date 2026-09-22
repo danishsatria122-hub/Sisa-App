@@ -29,9 +29,9 @@ export function AboutPerspective() {
 
         {/* Large Impactful Green-on-Green Statement */}
         <h2 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-[64px] font-medium text-white leading-[1.16] sm:leading-[1.12] tracking-tight max-w-4xl mx-auto">
-          "Yang kami ubah bukan hanya{' '}
+          &ldquo;Yang kami ubah bukan hanya{' '}
           <span className="text-smile-yellow">sampahnya</span>,<br />
-          tetapi <span className="underline decoration-white/40 decoration-wavy decoration-2 underline-offset-8">cara kita melihatnya</span>."
+          tetapi <span className="underline decoration-white/40 decoration-wavy decoration-2 underline-offset-8">cara kita melihatnya</span>.&rdquo;
         </h2>
 
         {/* Divider */}

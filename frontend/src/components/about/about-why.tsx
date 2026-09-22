@@ -30,9 +30,9 @@ export function AboutWhy() {
         {/* Large Pull-Quote Accent */}
         <div className="mt-10 sm:mt-14 mx-auto max-w-2xl">
           <blockquote className="relative font-display text-xl sm:text-2xl lg:text-3xl text-gray-400 font-light italic leading-relaxed">
-            <span className="absolute -top-6 -left-2 text-6xl text-primary-green/30 font-serif select-none leading-none">"</span>
+            <span className="absolute -top-6 -left-2 text-6xl text-primary-green/30 font-serif select-none leading-none">&ldquo;</span>
             Benda berhenti digunakan bukan karena tidak bernilai, tetapi karena kita berhenti melihat kemungkinan di dalamnya.
-            <span className="absolute -bottom-8 -right-2 text-6xl text-primary-green/30 font-serif select-none leading-none">"</span>
+            <span className="absolute -bottom-8 -right-2 text-6xl text-primary-green/30 font-serif select-none leading-none">&rdquo;</span>
           </blockquote>
         </div>
 

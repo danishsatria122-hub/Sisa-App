@@ -236,7 +236,7 @@ export function AboutProblem() {
           {/* Editorial Conclusion Quote */}
           <div className="mt-10 rounded-2xl bg-white p-6 border border-gray-200/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <p className="text-xs sm:text-sm text-gray-600 font-sans italic">
-              “Ketika jalur penampungannya jelas, apa yang kita anggap 'selesai' berubah menjadi permulaan baru.”
+              “Ketika jalur penampungannya jelas, apa yang kita anggap &lsquo;selesai&apos; berubah menjadi permulaan baru.”
             </p>
             <span className="shrink-0 text-xs font-semibold text-functional-green">
               SI:)SA Bridge System

@@ -112,7 +112,7 @@ export function AuthIllustrationSide({
         {/* Tagline quote block */}
         <div className="mt-10 border-l-2 border-smile-yellow/60 pl-4">
           <p className="font-sans text-sm italic text-white/70 leading-relaxed">
-            "A little smile for things left behind."
+            &ldquo;A little smile for things left behind.&rdquo;
           </p>
           <p className="mt-1 font-sans text-xs font-semibold text-smile-yellow/90 tracking-wide">
             — SI:)SA
