@@ -7,6 +7,7 @@ import { Setoran } from '@/lib/types';
 import { PageSpinner, ConfirmModal } from '@/components/ui';
 import { StatusBadge } from '@/components/status-badge';
 import { useToast } from '@/lib/toast-context';
+import { formatRupiah, getSetoranEstimate } from '@/lib/setoran-estimate';
 
 const QR_VISIBLE_STATUSES = ['DIAJUKAN', 'DITERIMA', 'DIVERIFIKASI'];
 
@@ -135,6 +136,16 @@ export default function DetailSetoranPage() {
                 <p className="text-xs text-gray-500">
                   Perkiraan: {item.beratPerkiraan} kg
                   {isVerified && item.beratReal != null && ` · Real: ${item.beratReal} kg`}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {(() => {
+                    const estimate = getSetoranEstimate(
+                      item.beratPerkiraan,
+                      item.hargaPerKgSnapshot,
+                      item.poinPerKgSnapshot,
+                    );
+                    return `~${formatRupiah(estimate.harga)} · ~${estimate.poin} poin (perkiraan)`;
+                  })()}
                 </p>
               </div>
               {isVerified && item.poinDidapat != null && (

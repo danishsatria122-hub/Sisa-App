@@ -7,6 +7,7 @@ import { Address, KategoriSampah, MetodeSetoran } from '@/lib/types';
 import { useToast } from '@/lib/toast-context';
 import { PageSpinner } from '@/components/ui';
 import { CategoryThumb } from '@/components/category-thumb';
+import { formatRupiah, getSetoranEstimate } from '@/lib/setoran-estimate';
 
 interface DraftItem {
   kategoriSampahId: string;
@@ -355,6 +356,13 @@ export default function SetoranBaruPage() {
             <div className="space-y-2">
               {items.map((item, idx) => {
                 const kategori = kategoriList.find((k) => k.id === item.kategoriSampahId);
+                const estimate = kategori
+                  ? getSetoranEstimate(
+                      parseFloat(item.beratPerkiraan) || 0,
+                      kategori.hargaPerKg,
+                      kategori.poinPerKg,
+                    )
+                  : null;
                 return (
                   <div
                     key={idx}
@@ -367,9 +375,16 @@ export default function SetoranBaruPage() {
                       size={48}
                     />
                     <span className="flex-1 text-gray-700">{kategori?.nama}</span>
-                    <span className="font-medium text-gray-800">
-                      {item.beratPerkiraan} kg (perkiraan)
-                    </span>
+                    <div className="shrink-0 text-right">
+                      <p className="font-medium text-gray-800">
+                        {item.beratPerkiraan} kg (perkiraan)
+                      </p>
+                      {estimate && (
+                        <p className="text-xs text-gray-400">
+                          ~{formatRupiah(estimate.harga)} · ~{estimate.poin} poin (perkiraan)
+                        </p>
+                      )}
+                    </div>
                   </div>
                 );
               })}
